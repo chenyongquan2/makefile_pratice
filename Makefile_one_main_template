@@ -1,0 +1,44 @@
+#####
+#该makefile为单main入口的版本，后续可直接把命名改为Makefile后可食用
+#####
+
+#编译器
+CC := g++
+
+#编译选项
+CFLAGS := -g -O2 -Wall -Werror -Wno-unused -ldl -std=c++14
+$(warning CFLAGS is $(CFLAGS))
+
+#头文件的搜索路径
+INCLUDE := -I . -I ./include
+$(warning INCLUDE is $(INCLUDE))
+
+#找到当前目录下，所有的.cpp文件
+SRCS :=$(shell find ./ -type f |grep '\.cpp')
+$(warning SRCS is $(SRCS))
+
+#根据.cpp文件确定对应的.o目标文件的名字
+OBJS:=$(patsubst %.cpp, %.o, $(filter %.cpp, $(SRCS)))
+#OBJS := sub.o add.o main.o 
+$(warning OBJS is $(OBJS))
+
+target: $(OBJS) main
+
+main:
+	$(CC) $(CFLAGS) $(INCLUDE) $(OBJS) -o main
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+# sub.o:
+# 	clang++ -I . -c sub.cpp -o sub.o
+# add.o:
+# 	clang++ -I . -c add.cpp -o add.o
+# main.o:
+# 	clang++ -I . -c main.cpp -o main.o
+
+
+
+clean:
+	rm -rf $(OBJS) main
+

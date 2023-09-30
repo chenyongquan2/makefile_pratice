@@ -1,0 +1,54 @@
+#####
+#该makefile为多main入口的版本，后续可直接把命名改为Makefile后可食用
+#####
+
+#编译器
+COMPILER := g++
+$(warning COMPILER is $(COMPILER))
+
+#编译选项
+CFLAGS := -g -O2 -Wall -Werror -Wno-unused -ldl -std=c++11
+$(warning CFLAGS is $(CFLAGS))
+
+#头文件的搜索路径
+INCLUDE := -I .
+$(warning INCLUDE is $(INCLUDE))
+
+#含有main()的多入口文件列表
+MAIN_SRC := main.cpp
+MAIN_OBJ := $(MAIN_SRC:%.cpp=%.o)
+MAIN_EXE := main
+
+TEST_SRC := test.cpp
+TEST_OBJ := $(TEST_SRC:%.cpp=%.o)
+TEST_EXE := test
+
+HAS_MAIN_FUNC_SRC := $(MAIN_SRC) $(TEST_SRC)
+$(warning HAS_MAIN_FUNC_SRC is $(HAS_MAIN_FUNC_SRC))
+
+#找到当前目录下，所有的.cpp文件
+#SRCS :=$(shell find ./ -type f |grep '\.cpp')
+SRCS :=$(shell find ./ -type f |grep '\.cpp' |grep -v '$(MAIN_SRC)' |grep -v '$(TEST_SRC)')
+#排除
+$(warning SRCS is $(SRCS))
+
+#根据.cpp文件确定对应的.o目标文件的名字
+OBJS:=$(patsubst %.cpp, %.o, $(filter %.cpp, $(SRCS)))
+#OBJS := sub.o add.o main.o 
+$(warning OBJS is $(OBJS))
+
+
+
+target: $(MAIN_EXE) $(TEST_EXE)
+$(MAIN_EXE): $(OBJS) $(MAIN_OBJ)
+	$(COMPILER) $(CFLAGS) $(INCLUDE) $^ -o $@
+
+$(TEST_EXE): $(OBJS) $(TEST_OBJ)
+	$(COMPILER) $(CFLAGS) $(INCLUDE) $^ -o $@
+
+%.o: %.cpp
+	$(COMPILER) $(CFLAGS) $(INCLUDE) -c $< -o $@
+
+clean:
+	rm -rf $(OBJS) $(MAIN_OBJ) $(TEST_OBJ) $(MAIN_EXE) $(TEST_EXE)
+
