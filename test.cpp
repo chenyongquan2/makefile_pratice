@@ -3,7 +3,7 @@
 #include <sub.h>
 
 //todo:当要测试多main入口，把此名改为main
-int mainMulti()
+int main()
 {
     int res = add(2, 3);
     std::cout << "2 + 3 = " << res << std::endl;
