@@ -22,8 +22,8 @@ MAIN_OBJ := $(MAIN_SRC:%.cpp=%.o)
 MAIN_EXE := main
 
 #，-not -path "./lib/*" 表示排除路径中包含"lib"目录的文件。
-EXECLUTE_PATH := -not -path './$(MAIN_SRC)'  -not -path './test.cpp'
-#EXECLUTE_PATH := -not -path './lib/*' -not -path './$(MAIN_SRC)'  -not -path './test.cpp'
+#EXECLUTE_PATH := -not -path './$(MAIN_SRC)'  -not -path './test.cpp'
+EXECLUTE_PATH := -not -path './lib/*' -not -path './$(MAIN_SRC)'  -not -path './test.cpp'
 
 #找到当前目录下，所有的.cpp文件
 #SRCS :=$(shell find ./ -type f -not -path './lib/*' |grep '\.cpp' |grep -v '$(MAIN_SRC)')
@@ -44,21 +44,26 @@ $(MAIN_EXE) : $(OBJS) $(MAIN_OBJ)
 MUL_SRC := ./lib/mul.cpp
 MUL_OBJ := $(MUL_SRC:%.cpp=%.o)
 MUL_LIB := ./lib/libmul.a
+MUL_DLL := ./lib/libmul.so
 #static为库名称
 static: $(MUL_LIB)
-
 # r：替换或插入目标文件到静态库中。如果库中不存在同名的目标文件，则插入；如果存在同名的目标文件，则替换。
 # c：创建静态库文件。如果静态库文件不存在，则创建；如果已存在，则覆盖。
 # s：创建索引表。这允许链接器更快地查找静态库中的符号。
 $(MUL_LIB): $(MUL_OBJ)
 	ar rcs $@ $^
 #r rs $@ $^
+	
+
+shared:$(MUL_DLL)
+$(MUL_DLL):$(MUL_OBJ)
+	$(CC) $(CFLAGS) $(INCLUDE) $^ -o $@ -fPIC -shared 
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
-
-
-
-
+	
 clean:
 	rm -rf $(OBJS) $(MAIN_OBJ) $(MAIN_EXE)
+
+clean_lib:
+	rm -rf ./lib/*.so ./lib/*.a
